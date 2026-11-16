@@ -1,0 +1,44 @@
+diff --git a/bootloader/SOURCES b/bootloader/SOURCES
+index 773b465..cff5289 100644
+--- a/bootloader/SOURCES
++++ b/bootloader/SOURCES
+@@ -8,6 +8,10 @@ snprintf.c
+ ipodnano2g.c
+ #elif defined(IPOD_6G) || defined(IPOD_NANO3G) || defined(IPOD_NANO4G)
+ ipod-s5l87xx.c
++#if defined(IPOD_6G)
++syscfgtool.c
++syscfgvalid.c
++#endif
+ #elif defined(IPOD_ARCH)
+ ipod.c
+ #elif defined(GIGABEAT_F)
+diff --git a/bootloader/ipod-s5l87xx.c b/bootloader/ipod-s5l87xx.c
+index ef97a7d..9a37bb0 100644
+--- a/bootloader/ipod-s5l87xx.c
++++ b/bootloader/ipod-s5l87xx.c
+@@ -63,6 +63,10 @@
+ #include "pmu-target.h"
+ #if defined(IPOD_6G) || defined(IPOD_NANO3G)
+ #include "norboot-target.h"
++
++#if defined(IPOD_6G) && defined(HAVE_BOOTLOADER_USB_MODE)
++bool syscfgtool_run(void);
++#endif
+ #endif
+ 
+ #if defined(IPOD_NANO3G)
+@@ -1197,6 +1201,13 @@ void main(void)
+         fatal_error(ERR_RB);
+     }
+ 
++#if defined(IPOD_6G) && defined(HAVE_BOOTLOADER_USB_MODE)
++    /* syscfgtool: NOR dump / guarded SysCFG flash on request. Results land on the
++     * disk; boot then continues into Rockbox, whose own USB mode exposes them.
++     * (The bootloader USB mode never enumerated on Windows, so it is not used.) */
++    syscfgtool_run();
++#endif
++
+     printf("Loading Rockbox...");
+     unsigned char *loadbuffer = (unsigned char *)DRAM_ORIG;
+     rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);

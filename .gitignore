@@ -1,0 +1,10 @@
+# per-device data: never commit
+originals/
+dumps/
+logs/
+# third-party downloads (see README)
+*.ipsw
+ipodclassic6g-rockbox-full-with-flashtools.zip
+iTunes*Setup*.exe
+__pycache__/
+*.pyc
